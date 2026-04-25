@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: skill-mcp
+  main:
+    banner-mode: off
+  profiles:
+    active: dev
+
+logging:
+  level:
+    root: info
+    org.springframework: warn
+
+skill-mcp:
+  scan:
+    roots:
+      - .
+    fixed-delay-millis: 300000
