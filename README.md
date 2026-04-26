@@ -17,6 +17,14 @@ The server is intentionally small for v1:
 
 The server exposes a JSON-RPC MCP endpoint at `/mcp`.
 
+## Why This Exists
+
+Existing MCP registries and managers are useful, but they mostly focus on public MCP server metadata, MCP server installation, gateway behavior, or sandboxed tool execution. Agent Skills and Claude Code Skills define and consume Skill folders, but they do not provide a small organization-owned MCP catalog that indexes several department-owned GitHub repositories through a GitHub App.
+
+Skill MCP is intentionally narrower: it catalogs internal Skills from Git, leaves source ownership with each department, avoids personal access tokens, avoids a database in v1, and never executes Skill code on the central server.
+
+See [ADR 0003](docs/adr/0003-custom-skill-catalog.md) for the product and OSS comparison behind this decision.
+
 ## Quick Start
 
 ```bash
@@ -401,4 +409,5 @@ The client or agent is responsible for fetching the Skill content and deciding w
 
 - [Design document](docs/DESIGN.md)
 - [Architecture decisions](docs/adr/0001-v1-architecture.md)
+- [Custom catalog rationale](docs/adr/0003-custom-skill-catalog.md)
 - [Japanese README](README-ja.md)

@@ -6,6 +6,18 @@ Skill MCP is a central catalog for Skills stored in multiple Git repositories ow
 
 The server does not store Skill source code. It scans configured local repository roots and configured GitHub repositories, reads `skill.yaml` manifests, validates each Skill directory, and keeps the resulting catalog in memory.
 
+## Background
+
+The project was created after comparing existing MCP registry, MCP manager, and Agent Skills offerings. Those projects are useful, but they solve adjacent problems:
+
+- The official MCP Registry is a public metadata registry for MCP servers. It explicitly focuses on publicly accessible servers and recommends a private registry for private servers. Its hosted registry is also in preview, and its codebase is not positioned as a supported self-hosting product.
+- MCP server registries and gateways such as ToolSDK MCP Registry, MCP Foundry, and MCPM primarily discover, install, proxy, or execute MCP servers and tools.
+- Agent Skills and Claude Code Skills define and use Skill folders, but they do not provide a small organization-owned MCP catalog that can index several department-owned GitHub repositories through a GitHub App.
+
+For this project, the desired first version is narrower: help about 200 internal users find organization-specific Skills that remain owned by their departments in Git. The catalog must be easy for employees to publish to, avoid personal access tokens, avoid a database, and avoid central execution of Skill code.
+
+See [ADR 0003](adr/0003-custom-skill-catalog.md) for the alternatives considered.
+
 ## Goals
 
 - Let general employees publish Skills by adding `SKILL.md` and `skill.yaml` to their own repositories.

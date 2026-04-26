@@ -17,6 +17,14 @@ v1では意図的に小さく始めます。
 
 MCP endpointは `/mcp` です。
 
+## このソフトウェアを作った背景
+
+既存のMCP registryやmanagerは有用ですが、多くは公開MCP serverのメタデータ管理、MCP serverのインストール、gateway、sandbox実行などを主眼にしています。Agent SkillsやClaude Code SkillsはSkill folderの形式や利用方法として重要ですが、部門ごとに管理される複数のGitHubリポジトリをGitHub Appで直接参照し、組織内向けにMCPで検索可能にする小さなカタログサーバーではありません。
+
+Skill MCPは意図的に範囲を絞っています。内部SkillをGitからカタログ化し、Skillの所有権は各部門のリポジトリに残し、personal access tokenを使わず、v1ではデータベースを持たず、中央サーバーではSkillコードを実行しません。
+
+この判断のために比較した製品・OSSは [ADR 0003](docs/adr/0003-custom-skill-catalog.md) に記録しています。
+
 ## 起動
 
 ```bash
@@ -206,4 +214,5 @@ executable:
 
 - [設計ドキュメント](docs/DESIGN.md)
 - [ADR](docs/adr/0001-v1-architecture.md)
+- [独自カタログを作る判断](docs/adr/0003-custom-skill-catalog.md)
 - [English README](README.md)
