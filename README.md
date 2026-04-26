@@ -8,11 +8,12 @@ The server is intentionally small for v1:
 - Package namespace: `dev.sobue.ai.skill.mcp`.
 - JSON support uses Spring Boot managed Jackson 3.
 - Skill manifest YAML parsing uses SnakeYAML.
+- GitHub repository access uses Hub4j GitHub API with GitHub App authentication.
 - No authentication or authorization.
 - No database.
 - No audit log.
 - No central execution of Skill source code.
-- In-memory catalog rebuilt from Git/worktree scans.
+- In-memory catalog rebuilt from local Git/worktree scans and configured GitHub repositories.
 
 The server exposes a JSON-RPC MCP endpoint at `/mcp`.
 
@@ -34,6 +35,23 @@ skill-mcp:
 ```
 
 Point `skill-mcp.scan.roots` at one or more checked-out Skill repositories or directories containing checked-out repositories.
+
+You can also scan GitHub repositories directly without checking them out locally:
+
+```yaml
+skill-mcp:
+  github:
+    app-id: ${GITHUB_APP_ID:}
+    installation-id: ${GITHUB_APP_INSTALLATION_ID:}
+    private-key-path: ${GITHUB_APP_PRIVATE_KEY_PATH:}
+    repositories:
+      - url: https://github.com/example/team-skills.git
+        ref: main
+      - url: git@github.com:example/platform-skills.git
+        ref: v1
+```
+
+GitHub access is designed for GitHub Apps, not personal access tokens. The app needs read-only repository contents access for the repositories it scans. You can also set `GITHUB_APP_PRIVATE_KEY` directly; use `\n` escapes when storing a PEM value in an environment variable.
 
 ## MCP Interface
 
@@ -181,7 +199,7 @@ executable:
 
 The central MCP server should publish a Skill when all of these conditions are true:
 
-- The repository is inside a configured GitHub organization or GitLab group.
+- The repository is under a configured local scan root or listed under `skill-mcp.github.repositories`.
 - A `skill.yaml` file exists under a Skill directory.
 - The manifest contains all required fields.
 - `skill_path` points to the Skill directory.

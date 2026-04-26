@@ -1,24 +1,33 @@
 package dev.sobue.ai.skill.mcp.catalog;
 
 import dev.sobue.ai.skill.mcp.config.SkillMcpProperties;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 
 @Service
 public class SkillCatalogService {
 
   private final SkillMcpProperties properties;
   private final SkillScanner scanner;
+  private final GitHubSkillScanner gitHubSkillScanner;
   private final AtomicReference<CatalogSnapshot> snapshot = new AtomicReference<>(CatalogSnapshot.empty());
 
-  public SkillCatalogService(SkillMcpProperties properties, SkillScanner scanner) {
+  public SkillCatalogService(
+      SkillMcpProperties properties, SkillScanner scanner, GitHubSkillScanner gitHubSkillScanner) {
     this.properties = properties;
     this.scanner = scanner;
+    this.gitHubSkillScanner = gitHubSkillScanner;
   }
 
   @EventListener(ApplicationReadyEvent.class)
@@ -28,7 +37,10 @@ public class SkillCatalogService {
 
   @Scheduled(fixedDelayString = "${skill-mcp.scan.fixed-delay-millis:300000}")
   public void refresh() {
-    CatalogSnapshot next = scanner.scan(properties.getScan().getRoots());
+    CatalogSnapshot next =
+        merge(
+            scanner.scan(properties.getScan().getRoots()),
+            gitHubSkillScanner.scan(properties.getGithub()));
     snapshot.set(next);
   }
 
@@ -65,5 +77,23 @@ public class SkillCatalogService {
 
   private String normalize(String value) {
     return value == null ? "" : value.toLowerCase().trim();
+  }
+
+  private CatalogSnapshot merge(CatalogSnapshot local, CatalogSnapshot github) {
+    List<SkillEntry> skills = new ArrayList<>();
+    List<String> warnings = new ArrayList<>();
+    Set<String> skillIds = new HashSet<>();
+
+    warnings.addAll(local.warnings());
+    warnings.addAll(github.warnings());
+    for (SkillEntry skill : Stream.concat(local.skills().stream(), github.skills().stream()).toList()) {
+      if (skillIds.add(skill.skillId())) {
+        skills.add(skill);
+      } else {
+        warnings.add("Skill skipped because skill_id is duplicated across sources: " + skill.skillId());
+      }
+    }
+    skills.sort(Comparator.comparing(SkillEntry::skillId));
+    return new CatalogSnapshot(List.copyOf(skills), List.copyOf(warnings), Instant.now());
   }
 }

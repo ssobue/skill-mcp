@@ -16,3 +16,10 @@ skill-mcp:
     roots:
       - .
     fixed-delay-millis: 300000
+  github:
+    base-api-url: https://api.github.com
+    app-id: ${GITHUB_APP_ID:}
+    installation-id: ${GITHUB_APP_INSTALLATION_ID:}
+    private-key: ${GITHUB_APP_PRIVATE_KEY:}
+    private-key-path: ${GITHUB_APP_PRIVATE_KEY_PATH:}
+    repositories: []

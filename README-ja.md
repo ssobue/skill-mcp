@@ -8,11 +8,12 @@ v1では意図的に小さく始めます。
 - package/namespaceは `dev.sobue.ai.skill.mcp`
 - JSON処理はSpring Boot管理のJackson 3を使用
 - Skill manifestのYAML読み込みはSnakeYAMLを使用
+- GitHubリポジトリアクセスはGitHub App認証付きのHub4j GitHub APIを使用
 - 認証・認可なし
 - データベースなし
 - 監査ログなし
 - 中央サーバーでSkillのソースコードを実行しない
-- Git/worktreeスキャンからメモリ上にカタログを再構築
+- ローカルGit/worktreeスキャンと設定済みGitHubリポジトリからメモリ上にカタログを再構築
 
 MCP endpointは `/mcp` です。
 
@@ -34,6 +35,23 @@ skill-mcp:
 ```
 
 `skill-mcp.scan.roots` には、チェックアウト済みのSkillリポジトリ、または複数リポジトリを含むディレクトリを指定します。
+
+ローカルにcloneせず、GitHubリポジトリを直接参照することもできます。
+
+```yaml
+skill-mcp:
+  github:
+    app-id: ${GITHUB_APP_ID:}
+    installation-id: ${GITHUB_APP_INSTALLATION_ID:}
+    private-key-path: ${GITHUB_APP_PRIVATE_KEY_PATH:}
+    repositories:
+      - url: https://github.com/example/team-skills.git
+        ref: main
+      - url: git@github.com:example/platform-skills.git
+        ref: v1
+```
+
+GitHubアクセスはpersonal access tokenではなくGitHub App前提です。対象リポジトリを読むため、GitHub AppにはRepository contentsのread権限を付与します。PEMを環境変数で渡す場合は `GITHUB_APP_PRIVATE_KEY` に `\n` エスケープ付きで設定できます。
 
 ## MCPインターフェース
 

@@ -12,6 +12,7 @@ This repository contains Skill MCP, a Spring Boot based MCP catalog server for S
 - Use Gradle Wrapper for builds.
 - Use Spring Boot managed Jackson 3 for JSON.
 - Use SnakeYAML for `skill.yaml`; do not add Jackson YAML for manifest parsing.
+- Use Hub4j GitHub API for GitHub repository access.
 - Run tests with:
 
 ```bash
@@ -29,6 +30,7 @@ export JAVA_HOME="$(/usr/libexec/java_home -v 25)"
 ## Architecture Rules
 
 - Keep Git as the source of truth for Skill definitions.
+- Support both local worktree sources and configured GitHub repository sources.
 - Do not introduce a database in v1.
 - Do not add authentication or authorization in v1.
 - Do not add audit logging in v1.

@@ -4,7 +4,7 @@
 
 Skill MCP is a central catalog for Skills stored in multiple Git repositories owned by departments or teams.
 
-The server does not store Skill source code. It scans configured repository roots, reads `skill.yaml` manifests, validates each Skill directory, and keeps the resulting catalog in memory.
+The server does not store Skill source code. It scans configured local repository roots and configured GitHub repositories, reads `skill.yaml` manifests, validates each Skill directory, and keeps the resulting catalog in memory.
 
 ## Goals
 
@@ -35,7 +35,9 @@ dev.sobue.ai.skill.mcp
 
 Main components:
 
-- `SkillScanner`: finds `skill.yaml`, parses manifests, validates `SKILL.md`, and builds catalog entries.
+- `SkillScanner`: finds `skill.yaml` in local worktrees, parses manifests, validates `SKILL.md`, and builds catalog entries.
+- `GitHubSkillScanner`: scans configured GitHub repositories through a `GitHubClient` abstraction.
+- `GitHubApiClient`: uses Hub4j GitHub API to authenticate as a GitHub App installation and read repository trees and blobs.
 - `SkillCatalogService`: owns the current in-memory `CatalogSnapshot` and refreshes it on startup and schedule.
 - `McpController`: exposes JSON-RPC MCP methods at `/mcp`.
 
@@ -52,7 +54,18 @@ skill-mcp:
       - /path/to/skill-repository
       - /path/to/department-repositories
     fixed-delay-millis: 300000
+  github:
+    app-id: ${GITHUB_APP_ID:}
+    installation-id: ${GITHUB_APP_INSTALLATION_ID:}
+    private-key-path: ${GITHUB_APP_PRIVATE_KEY_PATH:}
+    repositories:
+      - url: https://github.com/example/team-skills.git
+        ref: main
 ```
+
+Local roots are scanned from the filesystem. GitHub repositories are scanned without checkout by using Hub4j GitHub API to read recursive repository trees and blob contents.
+
+GitHub access uses GitHub App authentication. The server signs a short-lived JWT with the app private key, uses Hub4j to create an installation access token, caches the resulting GitHub client until near token expiry, and uses it for repository API requests. Personal access tokens are intentionally not part of the design.
 
 Each scan builds a new immutable snapshot. The current implementation replaces the old snapshot after scanning. Invalid manifests are skipped and reported as warnings in the snapshot.
 
@@ -122,4 +135,4 @@ The intended flow is:
 
 ## Scaling Assumption
 
-The v1 target is around 200 users. The catalog is expected to be small enough for in-memory search. Horizontal scaling is possible by running multiple instances, each independently scanning the same configured roots.
+The v1 target is around 200 users. The catalog is expected to be small enough for in-memory search. Horizontal scaling is possible by running multiple instances, each independently scanning the same configured local roots and GitHub repositories.

@@ -106,11 +106,21 @@ public class SkillScanner {
   }
 
   @SuppressWarnings("unchecked")
-  private SkillManifest readSkillManifest(Path manifestPath) throws IOException {
+  SkillManifest readSkillManifest(Path manifestPath) throws IOException {
     Object loaded;
     try (var reader = Files.newBufferedReader(manifestPath, StandardCharsets.UTF_8)) {
       loaded = yaml.load(reader);
     }
+    return readSkillManifest(loaded);
+  }
+
+  SkillManifest readSkillManifest(String manifestYaml) {
+    Object loaded = yaml.load(manifestYaml);
+    return readSkillManifest(loaded);
+  }
+
+  @SuppressWarnings("unchecked")
+  private SkillManifest readSkillManifest(Object loaded) {
     Map<String, Object> values =
         loaded instanceof Map<?, ?> map ? (Map<String, Object>) map : new LinkedHashMap<>();
     return new SkillManifest(
@@ -172,7 +182,7 @@ public class SkillScanner {
     return value instanceof Map<?, ?> map ? (Map<String, Object>) map : Map.of();
   }
 
-  private List<String> validate(SkillManifest manifest) {
+  List<String> validate(SkillManifest manifest) {
     List<String> errors = new ArrayList<>();
     require(errors, manifest.skillId(), "skill_id");
     require(errors, manifest.name(), "name");

@@ -10,8 +10,14 @@ public class SkillMcpProperties {
 
   private final Scan scan = new Scan();
 
+  private final GitHub github = new GitHub();
+
   public Scan getScan() {
     return scan;
+  }
+
+  public GitHub getGithub() {
+    return github;
   }
 
   public static class Scan {
@@ -34,6 +40,92 @@ public class SkillMcpProperties {
 
     public void setFixedDelayMillis(long fixedDelayMillis) {
       this.fixedDelayMillis = fixedDelayMillis;
+    }
+  }
+
+  public static class GitHub {
+
+    private String baseApiUrl = "https://api.github.com";
+
+    private String appId;
+
+    private String installationId;
+
+    private String privateKey;
+
+    private Path privateKeyPath;
+
+    private List<Repository> repositories = new ArrayList<>();
+
+    public String getBaseApiUrl() {
+      return baseApiUrl;
+    }
+
+    public void setBaseApiUrl(String baseApiUrl) {
+      this.baseApiUrl = baseApiUrl;
+    }
+
+    public String getAppId() {
+      return appId;
+    }
+
+    public void setAppId(String appId) {
+      this.appId = appId;
+    }
+
+    public String getInstallationId() {
+      return installationId;
+    }
+
+    public void setInstallationId(String installationId) {
+      this.installationId = installationId;
+    }
+
+    public String getPrivateKey() {
+      return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+      this.privateKey = privateKey;
+    }
+
+    public Path getPrivateKeyPath() {
+      return privateKeyPath;
+    }
+
+    public void setPrivateKeyPath(Path privateKeyPath) {
+      this.privateKeyPath = privateKeyPath;
+    }
+
+    public List<Repository> getRepositories() {
+      return repositories;
+    }
+
+    public void setRepositories(List<Repository> repositories) {
+      this.repositories = repositories;
+    }
+  }
+
+  public static class Repository {
+
+    private String url;
+
+    private String ref = "main";
+
+    public String getUrl() {
+      return url;
+    }
+
+    public void setUrl(String url) {
+      this.url = url;
+    }
+
+    public String getRef() {
+      return ref;
+    }
+
+    public void setRef(String ref) {
+      this.ref = ref;
     }
   }
 }

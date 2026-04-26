@@ -28,6 +28,7 @@ dependencies {
     implementation 'io.modelcontextprotocol.sdk:mcp-spring-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-json'
+    implementation 'org.kohsuke:github-api:1.330'
     implementation 'org.yaml:snakeyaml'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
