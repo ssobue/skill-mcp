@@ -28,8 +28,20 @@ See [ADR 0003](docs/adr/0003-custom-skill-catalog.md) for the product and OSS co
 ## Quick Start
 
 ```bash
-./gradlew test
-./gradlew bootRun
+./mvnw test
+./mvnw spring-boot:run
+```
+
+Build the application:
+
+```bash
+./mvnw verify
+```
+
+Build a GraalVM native executable:
+
+```bash
+./mvnw -Pnative native:compile
 ```
 
 By default, the server scans the current repository root:

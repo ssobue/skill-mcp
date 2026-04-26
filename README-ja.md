@@ -28,8 +28,20 @@ Skill MCPは意図的に範囲を絞っています。内部SkillをGitからカ
 ## 起動
 
 ```bash
-./gradlew test
-./gradlew bootRun
+./mvnw test
+./mvnw spring-boot:run
+```
+
+アプリケーションをビルドします。
+
+```bash
+./mvnw verify
+```
+
+GraalVM native executableをビルドします。
+
+```bash
+./mvnw -Pnative native:compile
 ```
 
 デフォルトでは現在のリポジトリルートをスキャンします。

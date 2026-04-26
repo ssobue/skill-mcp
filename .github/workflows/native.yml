@@ -1,0 +1,28 @@
+name: GraalVM Native CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: Set up GraalVM JDK 25
+      uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: '25'
+        distribution: 'graalvm-community'
+        cache: maven
+    - name: Build native executable
+      run: ./mvnw --batch-mode -Pnative native:compile
+    - name: Upload native executable
+      uses: actions/upload-artifact@v7
+      with:
+        name: skill-mcp-linux
+        path: ./target/skill-mcp

@@ -9,14 +9,26 @@ This repository contains Skill MCP, a Spring Boot based MCP catalog server for S
 - Use Java 25.
 - Follow the lightweight Spring Boot project style used by `https://github.com/ssobue/demo`.
 - The base package is `dev.sobue.ai.skill.mcp`.
-- Use Gradle Wrapper for builds.
+- Use Maven Wrapper for builds.
 - Use Spring Boot managed Jackson 3 for JSON.
 - Use SnakeYAML for `skill.yaml`; do not add Jackson YAML for manifest parsing.
 - Use Hub4j GitHub API for GitHub repository access.
 - Run tests with:
 
 ```bash
-./gradlew test
+./mvnw test
+```
+
+Run the full verification build with:
+
+```bash
+./mvnw verify
+```
+
+Build a GraalVM native executable with:
+
+```bash
+./mvnw -Pnative native:compile
 ```
 
 If a build fails because of Java version differences, verify with more than one installed JDK. Use `/usr/libexec/java_home` to switch `JAVA_HOME`.
