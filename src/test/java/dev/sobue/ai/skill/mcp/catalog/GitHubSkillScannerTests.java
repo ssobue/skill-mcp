@@ -48,7 +48,7 @@ class GitHubSkillScannerTests {
     assertThat(skill.skillId()).isEqualTo("example-skill");
     assertThat(skill.repositoryUrl()).isEqualTo("https://github.com/example/skills.git");
     assertThat(skill.ref()).isEqualTo("main");
-    assertThat(skill.manifestPath().toString()).isEqualTo("skills/example-skill/skill.yaml");
+    assertThat(skill.manifestPath()).hasToString("skills/example-skill/skill.yaml");
   }
 
   @Test

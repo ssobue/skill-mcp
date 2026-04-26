@@ -64,6 +64,9 @@ public class GitHubSkillScanner {
       for (GitHubTreeItem manifestItem : manifests) {
         readManifest(repository, manifestItem, paths, entries, warnings, skillIds);
       }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      warnings.add("Interrupted while scanning GitHub repository " + repository.url() + ": " + e.getMessage());
     } catch (Exception e) {
       warnings.add("Failed to scan GitHub repository " + repository.url() + ": " + e.getMessage());
     }
@@ -112,6 +115,15 @@ public class GitHubSkillScanner {
               Path.of(manifestItem.path()),
               Path.of(manifest.skillPath()),
               Instant.now()));
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      warnings.add(
+          "Interrupted while reading GitHub Skill manifest "
+              + repository.url()
+              + "/"
+              + manifestItem.path()
+              + ": "
+              + e.getMessage());
     } catch (Exception e) {
       warnings.add(
           "Failed to read GitHub Skill manifest "

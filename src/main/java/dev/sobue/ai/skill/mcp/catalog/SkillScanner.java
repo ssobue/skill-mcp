@@ -222,7 +222,7 @@ public class SkillScanner {
         return Optional.of(content.substring("ref: refs/heads/".length()));
       }
       return Optional.of("HEAD");
-    } catch (IOException e) {
+    } catch (IOException _) {
       return Optional.empty();
     }
   }
@@ -243,7 +243,7 @@ public class SkillScanner {
           return Optional.of(trimmed.substring("url = ".length()));
         }
       }
-    } catch (IOException e) {
+    } catch (IOException _) {
       return Optional.empty();
     }
     return Optional.empty();

@@ -18,6 +18,20 @@ import tools.jackson.databind.json.JsonMapper;
 public class McpController {
 
   private static final String PROTOCOL_VERSION = "2025-11-25";
+  private static final String KEY_ARGUMENTS = "arguments";
+  private static final String KEY_DESCRIPTION = "description";
+  private static final String KEY_MIME_TYPE = "mimeType";
+  private static final String KEY_NAME = "name";
+  private static final String KEY_SKILL_ID = "skill_id";
+  private static final String KEY_TEXT = "text";
+  private static final String KEY_TITLE = "title";
+  private static final String KEY_TYPE = "type";
+  private static final String KEY_URI = "uri";
+  private static final String MEDIA_TYPE_JSON = "application/json";
+  private static final String OWNER_DEPARTMENT = "owner_department";
+  private static final String OWNER_TEAM = "owner_team";
+  private static final String SCHEMA_TYPE_STRING = "string";
+  private static final String SKILL_URI_PREFIX = "skill://";
 
   private final SkillCatalogService catalogService;
   private final JsonMapper objectMapper;
@@ -45,16 +59,14 @@ public class McpController {
   }
 
   private Map<String, Object> initializeResult() {
+    Map<String, Object> capability = Map.of("listChanged", false);
     return Map.of(
         "protocolVersion",
         PROTOCOL_VERSION,
         "capabilities",
-        Map.of(
-            "resources", Map.of("listChanged", false),
-            "tools", Map.of("listChanged", false),
-            "prompts", Map.of("listChanged", false)),
+        Map.of("resources", capability, "tools", capability, "prompts", capability),
         "serverInfo",
-        Map.of("name", "skill-mcp", "version", "0.0.1"));
+        Map.of(KEY_NAME, "skill-mcp", "version", "0.0.1"));
   }
 
   private Map<String, Object> listResources() {
@@ -63,21 +75,21 @@ public class McpController {
             .map(
                 skill ->
                     Map.<String, Object>of(
-                        "uri", "skill://" + skill.skillId(),
-                        "name", skill.skillId(),
-                        "title", skill.name(),
-                        "description", skill.description(),
-                        "mimeType", "application/json"))
+                        KEY_URI, skillUri(skill.skillId()),
+                        KEY_NAME, skill.skillId(),
+                        KEY_TITLE, skill.name(),
+                        KEY_DESCRIPTION, skill.description(),
+                        KEY_MIME_TYPE, MEDIA_TYPE_JSON))
             .toList();
     return Map.of("resources", resources);
   }
 
   private JsonRpcResponse readResource(JsonRpcRequest request) {
-    String uri = stringParam(request, "uri");
-    if (uri == null || !uri.startsWith("skill://")) {
+    String uri = stringParam(request, KEY_URI);
+    if (uri == null || !uri.startsWith(SKILL_URI_PREFIX)) {
       return JsonRpcResponse.error(request.id(), -32602, "resources/read requires uri skill://<skill_id>");
     }
-    String skillId = uri.substring("skill://".length());
+    String skillId = uri.substring(SKILL_URI_PREFIX.length());
     return catalogService
         .findById(skillId)
         .map(skill -> JsonRpcResponse.result(request.id(), resourceContents(skill)))
@@ -89,11 +101,11 @@ public class McpController {
         "contents",
         List.of(
             Map.of(
-                "uri",
-                "skill://" + skill.skillId(),
-                "mimeType",
-                "application/json",
-                "text",
+                KEY_URI,
+                skillUri(skill.skillId()),
+                KEY_MIME_TYPE,
+                MEDIA_TYPE_JSON,
+                KEY_TEXT,
                 toJson(skillView(skill)))));
   }
 
@@ -104,14 +116,14 @@ public class McpController {
             Map.of(
                 "uriTemplate",
                 "skill://{skill_id}",
-                "name",
+                KEY_NAME,
                 "skill",
-                "title",
+                KEY_TITLE,
                 "Skill metadata",
-                "description",
+                KEY_DESCRIPTION,
                 "Read metadata and location for a discovered Skill.",
-                "mimeType",
-                "application/json")));
+                KEY_MIME_TYPE,
+                MEDIA_TYPE_JSON)));
   }
 
   private Map<String, Object> listTools() {
@@ -119,44 +131,44 @@ public class McpController {
         "tools",
         List.of(
             Map.of(
-                "name",
+                KEY_NAME,
                 "search_skills",
-                "description",
+                KEY_DESCRIPTION,
                 "Search discovered Skills by keyword, tag, department, or team.",
                 "inputSchema",
                 objectSchema(
                     Map.of(
-                        "query", Map.of("type", "string"),
-                        "tag", Map.of("type", "string"),
-                        "owner_department", Map.of("type", "string"),
-                        "owner_team", Map.of("type", "string")))),
+                        "query", stringSchema(),
+                        "tag", stringSchema(),
+                        OWNER_DEPARTMENT, stringSchema(),
+                        OWNER_TEAM, stringSchema()))),
             Map.of(
-                "name",
+                KEY_NAME,
                 "get_skill_location",
-                "description",
+                KEY_DESCRIPTION,
                 "Return Git repository location details for a Skill.",
                 "inputSchema",
-                objectSchema(Map.of("skill_id", Map.of("type", "string")), List.of("skill_id")))));
+                objectSchema(Map.of(KEY_SKILL_ID, stringSchema()), List.of(KEY_SKILL_ID)))));
   }
 
   private JsonRpcResponse callTool(JsonRpcRequest request) {
-    String name = stringParam(request, "name");
-    Map<String, Object> arguments = mapParam(request, "arguments");
+    String name = stringParam(request, KEY_NAME);
+    Map<String, Object> arguments = mapParam(request, KEY_ARGUMENTS);
     if ("search_skills".equals(name)) {
       List<Map<String, Object>> skills =
           catalogService
               .search(
                   stringValue(arguments, "query"),
                   stringValue(arguments, "tag"),
-                  stringValue(arguments, "owner_department"),
-                  stringValue(arguments, "owner_team"))
+                  stringValue(arguments, OWNER_DEPARTMENT),
+                  stringValue(arguments, OWNER_TEAM))
               .stream()
               .map(this::skillView)
               .toList();
       return JsonRpcResponse.result(request.id(), textToolResult(toJson(Map.of("skills", skills))));
     }
     if ("get_skill_location".equals(name)) {
-      String skillId = stringValue(arguments, "skill_id");
+      String skillId = stringValue(arguments, KEY_SKILL_ID);
       return catalogService
           .findById(skillId)
           .map(skill -> JsonRpcResponse.result(request.id(), textToolResult(toJson(locationView(skill)))))
@@ -170,27 +182,27 @@ public class McpController {
         "prompts",
         List.of(
             Map.of(
-                "name",
+                KEY_NAME,
                 "find-skill",
-                "title",
+                KEY_TITLE,
                 "Find a Skill",
-                "description",
+                KEY_DESCRIPTION,
                 "Help a user find a suitable Skill from the central catalog.",
-                "arguments",
-                List.of(Map.of("name", "task", "description", "User task", "required", true)))));
+                KEY_ARGUMENTS,
+                List.of(Map.of(KEY_NAME, "task", KEY_DESCRIPTION, "User task", "required", true)))));
   }
 
   private JsonRpcResponse getPrompt(JsonRpcRequest request) {
-    String name = stringParam(request, "name");
+    String name = stringParam(request, KEY_NAME);
     if (!"find-skill".equals(name)) {
       return JsonRpcResponse.error(request.id(), -32004, "Prompt not found: " + name);
     }
-    Map<String, Object> arguments = mapParam(request, "arguments");
+    Map<String, Object> arguments = mapParam(request, KEY_ARGUMENTS);
     String task = stringValue(arguments, "task");
     return JsonRpcResponse.result(
         request.id(),
         Map.of(
-            "description",
+            KEY_DESCRIPTION,
             "Find a Skill for a user task.",
             "messages",
             List.of(
@@ -199,20 +211,20 @@ public class McpController {
                     "user",
                     "content",
                     Map.of(
-                        "type",
-                        "text",
-                        "text",
+                        KEY_TYPE,
+                        KEY_TEXT,
+                        KEY_TEXT,
                         "Find the best Skill for this task using search_skills, then explain how to fetch it: "
                             + task)))));
   }
 
   private Map<String, Object> skillView(SkillEntry skill) {
     Map<String, Object> view = new LinkedHashMap<>();
-    view.put("skill_id", skill.skillId());
-    view.put("name", skill.name());
-    view.put("description", skill.description());
-    view.put("owner_department", skill.ownerDepartment());
-    view.put("owner_team", skill.ownerTeam());
+    view.put(KEY_SKILL_ID, skill.skillId());
+    view.put(KEY_NAME, skill.name());
+    view.put(KEY_DESCRIPTION, skill.description());
+    view.put(OWNER_DEPARTMENT, skill.ownerDepartment());
+    view.put(OWNER_TEAM, skill.ownerTeam());
     view.put("tags", skill.tags());
     view.put("visibility_groups", skill.visibilityGroups());
     view.put("location", locationView(skill));
@@ -235,7 +247,7 @@ public class McpController {
   }
 
   private Map<String, Object> textToolResult(String text) {
-    return Map.of("content", List.of(Map.of("type", "text", "text", text)), "isError", false);
+    return Map.of("content", List.of(Map.of(KEY_TYPE, KEY_TEXT, KEY_TEXT, text)), "isError", false);
   }
 
   private Map<String, Object> objectSchema(Map<String, Object> properties) {
@@ -243,7 +255,15 @@ public class McpController {
   }
 
   private Map<String, Object> objectSchema(Map<String, Object> properties, List<String> required) {
-    return Map.of("type", "object", "properties", properties, "required", required);
+    return Map.of(KEY_TYPE, "object", "properties", properties, "required", required);
+  }
+
+  private Map<String, Object> stringSchema() {
+    return Map.of(KEY_TYPE, SCHEMA_TYPE_STRING);
+  }
+
+  private String skillUri(String skillId) {
+    return SKILL_URI_PREFIX + skillId;
   }
 
   @SuppressWarnings("unchecked")
