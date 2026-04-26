@@ -44,6 +44,43 @@ class SkillScannerTests {
   }
 
   @Test
+  void parsesOptionalManifestFields() {
+    SkillManifest manifest =
+        scanner.readSkillManifest(
+            """
+            skill_id: executable-skill
+            name: Executable Skill
+            description: Has executable metadata.
+            owner_department: Engineering
+            owner_team: Platform
+            tags: test
+            skill_path: skills/executable-skill
+            visibility_groups:
+              - platform
+            executable:
+              type: command
+              runtime: shell
+              working_directory: .
+              command: ./scripts/run.sh
+              args:
+                - --verbose
+              inputs:
+                - name: input
+                  type: file
+              permissions:
+                filesystem: workspace
+                network: false
+            """);
+
+    assertThat(manifest.tags()).containsExactly("test");
+    assertThat(manifest.visibilityGroups()).containsExactly("platform");
+    assertThat(manifest.executable().type()).isEqualTo("command");
+    assertThat(manifest.executable().args()).containsExactly("--verbose");
+    assertThat(manifest.executable().inputs()).hasSize(1);
+    assertThat(manifest.executable().permissions()).containsEntry("filesystem", "workspace");
+  }
+
+  @Test
   void skipsManifestWhenSkillMarkdownIsMissing() throws IOException {
     Path skillDir = tempDir.resolve("skills/broken-skill");
     Files.createDirectories(skillDir);
