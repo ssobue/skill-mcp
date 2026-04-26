@@ -12,7 +12,7 @@ The initial user base is around 200 people. The first version should avoid opera
 
 ## Decision
 
-Build Skill MCP as a Java 21 Spring Boot service using the package namespace `dev.sobue.ai.skill.mcp`.
+Build Skill MCP as a Java 25 Spring Boot service using the package namespace `dev.sobue.ai.skill.mcp`.
 
 For v1:
 

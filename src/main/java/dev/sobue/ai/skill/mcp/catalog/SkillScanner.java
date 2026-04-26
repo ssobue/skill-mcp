@@ -23,8 +23,6 @@ public class SkillScanner {
 
   private final Yaml yaml = new Yaml();
 
-  public SkillScanner() {}
-
   public CatalogSnapshot scan(List<Path> roots) {
     List<SkillEntry> entries = new ArrayList<>();
     List<String> warnings = new ArrayList<>();

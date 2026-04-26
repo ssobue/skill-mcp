@@ -4,7 +4,7 @@ Skill MCPは、部門やチームが管理する複数のGitリポジトリに�
 
 v1では意図的に小さく始めます。
 
-- `ssobue/demo` の作法に寄せたJava 21 + Spring Boot構成
+- `ssobue/demo` の作法に寄せたJava 25 + Spring Boot構成
 - package/namespaceは `dev.sobue.ai.skill.mcp`
 - JSON処理はSpring Boot管理のJackson 3を使用
 - Skill manifestのYAML読み込みはSnakeYAMLを使用

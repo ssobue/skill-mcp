@@ -12,21 +12,16 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class GitHubApiClient implements GitHubClient {
 
   private final SkillMcpProperties properties;
   private final GitHubAppJwtProvider jwtProvider;
   private InstallationGitHubCache installationGitHubCache;
-
-  @Autowired
-  public GitHubApiClient(SkillMcpProperties properties, GitHubAppJwtProvider jwtProvider) {
-    this.properties = properties;
-    this.jwtProvider = jwtProvider;
-  }
 
   @Override
   public GitHubTree fetchTree(GitHubRepositoryRef repository) throws IOException {
@@ -54,13 +49,13 @@ public class GitHubApiClient implements GitHubClient {
     }
     String jwt = jwtProvider.createJwt();
     GitHub appGitHub =
-        new GitHubBuilder().withEndpoint(properties.getGithub().getBaseApiUrl()).withJwtToken(jwt).build();
+        new GitHubBuilder().withEndpoint(properties.github().baseApiUrl()).withJwtToken(jwt).build();
     GHAppInstallation installation =
-        appGitHub.getApp().getInstallationById(Long.parseLong(properties.getGithub().getInstallationId()));
+        appGitHub.getApp().getInstallationById(Long.parseLong(properties.github().installationId()));
     GHAppInstallationToken token = installation.createToken().create();
     GitHub installationGitHub =
         new GitHubBuilder()
-            .withEndpoint(properties.getGithub().getBaseApiUrl())
+            .withEndpoint(properties.github().baseApiUrl())
             .withAppInstallationToken(token.getToken())
             .build();
     installationGitHubCache =

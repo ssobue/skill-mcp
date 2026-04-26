@@ -1,131 +1,59 @@
 package dev.sobue.ai.skill.mcp.config;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
 
 @ConfigurationProperties(prefix = "skill-mcp")
-public class SkillMcpProperties {
+public record SkillMcpProperties(Scan scan, GitHub github) {
 
-  private final Scan scan = new Scan();
-
-  private final GitHub github = new GitHub();
-
-  public Scan getScan() {
-    return scan;
+  public SkillMcpProperties {
+    scan = scan == null ? new Scan() : scan;
+    github = github == null ? new GitHub() : github;
   }
 
-  public GitHub getGithub() {
-    return github;
+  public SkillMcpProperties() {
+    this(new Scan(), new GitHub());
   }
 
-  public static class Scan {
+  public record Scan(List<Path> roots, long fixedDelayMillis) {
 
-    private List<Path> roots = new ArrayList<>(List.of(Path.of(".")));
-
-    private long fixedDelayMillis = 300_000L;
-
-    public List<Path> getRoots() {
-      return roots;
+    public Scan {
+      roots = roots == null || roots.isEmpty() ? List.of(Path.of(".")) : List.copyOf(roots);
     }
 
-    public void setRoots(List<Path> roots) {
-      this.roots = roots;
-    }
-
-    public long getFixedDelayMillis() {
-      return fixedDelayMillis;
-    }
-
-    public void setFixedDelayMillis(long fixedDelayMillis) {
-      this.fixedDelayMillis = fixedDelayMillis;
+    public Scan() {
+      this(List.of(Path.of(".")), 300_000L);
     }
   }
 
-  public static class GitHub {
+  public record GitHub(
+      String baseApiUrl,
+      String appId,
+      String installationId,
+      String privateKey,
+      Path privateKeyPath,
+      List<Repository> repositories) {
 
-    private String baseApiUrl = "https://api.github.com";
-
-    private String appId;
-
-    private String installationId;
-
-    private String privateKey;
-
-    private Path privateKeyPath;
-
-    private List<Repository> repositories = new ArrayList<>();
-
-    public String getBaseApiUrl() {
-      return baseApiUrl;
+    public GitHub {
+      baseApiUrl = StringUtils.hasText(baseApiUrl) ? baseApiUrl : "https://api.github.com";
+      repositories = repositories == null ? List.of() : List.copyOf(repositories);
     }
 
-    public void setBaseApiUrl(String baseApiUrl) {
-      this.baseApiUrl = baseApiUrl;
-    }
-
-    public String getAppId() {
-      return appId;
-    }
-
-    public void setAppId(String appId) {
-      this.appId = appId;
-    }
-
-    public String getInstallationId() {
-      return installationId;
-    }
-
-    public void setInstallationId(String installationId) {
-      this.installationId = installationId;
-    }
-
-    public String getPrivateKey() {
-      return privateKey;
-    }
-
-    public void setPrivateKey(String privateKey) {
-      this.privateKey = privateKey;
-    }
-
-    public Path getPrivateKeyPath() {
-      return privateKeyPath;
-    }
-
-    public void setPrivateKeyPath(Path privateKeyPath) {
-      this.privateKeyPath = privateKeyPath;
-    }
-
-    public List<Repository> getRepositories() {
-      return repositories;
-    }
-
-    public void setRepositories(List<Repository> repositories) {
-      this.repositories = repositories;
+    public GitHub() {
+      this("https://api.github.com", null, null, null, null, List.of());
     }
   }
 
-  public static class Repository {
+  public record Repository(String url, String ref) {
 
-    private String url;
-
-    private String ref = "main";
-
-    public String getUrl() {
-      return url;
+    public Repository {
+      ref = StringUtils.hasText(ref) ? ref : "main";
     }
 
-    public void setUrl(String url) {
-      this.url = url;
-    }
-
-    public String getRef() {
-      return ref;
-    }
-
-    public void setRef(String ref) {
-      this.ref = ref;
+    public Repository(String url) {
+      this(url, "main");
     }
   }
 }

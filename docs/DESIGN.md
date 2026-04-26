@@ -37,7 +37,7 @@ See [ADR 0003](adr/0003-custom-skill-catalog.md) for the alternatives considered
 
 ## Runtime Architecture
 
-The application is a Java 21 Spring Boot service.
+The application is a Java 25 Spring Boot service.
 
 Main package:
 

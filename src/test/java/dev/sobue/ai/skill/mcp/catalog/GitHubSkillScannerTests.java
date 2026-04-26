@@ -11,11 +11,14 @@ class GitHubSkillScannerTests {
 
   @Test
   void scansGitHubRepositoryManifest() {
-    SkillMcpProperties.GitHub config = new SkillMcpProperties.GitHub();
-    SkillMcpProperties.Repository repository = new SkillMcpProperties.Repository();
-    repository.setUrl("https://github.com/example/skills.git");
-    repository.setRef("main");
-    config.setRepositories(List.of(repository));
+    SkillMcpProperties.GitHub config =
+        new SkillMcpProperties.GitHub(
+            "https://api.github.com",
+            null,
+            null,
+            null,
+            null,
+            List.of(new SkillMcpProperties.Repository("https://github.com/example/skills.git", "main")));
 
     GitHubSkillScanner scanner =
         new GitHubSkillScanner(
@@ -50,10 +53,14 @@ class GitHubSkillScannerTests {
 
   @Test
   void skipsGitHubManifestWhenSkillMarkdownIsMissing() {
-    SkillMcpProperties.GitHub config = new SkillMcpProperties.GitHub();
-    SkillMcpProperties.Repository repository = new SkillMcpProperties.Repository();
-    repository.setUrl("git@github.com:example/skills.git");
-    config.setRepositories(List.of(repository));
+    SkillMcpProperties.GitHub config =
+        new SkillMcpProperties.GitHub(
+            "https://api.github.com",
+            null,
+            null,
+            null,
+            null,
+            List.of(new SkillMcpProperties.Repository("git@github.com:example/skills.git")));
 
     GitHubSkillScanner scanner =
         new GitHubSkillScanner(

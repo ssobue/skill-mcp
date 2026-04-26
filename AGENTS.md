@@ -6,7 +6,7 @@ This repository contains Skill MCP, a Spring Boot based MCP catalog server for S
 
 ## Language and Build
 
-- Use Java 21.
+- Use Java 25.
 - Follow the lightweight Spring Boot project style used by `https://github.com/ssobue/demo`.
 - The base package is `dev.sobue.ai.skill.mcp`.
 - Use Gradle Wrapper for builds.

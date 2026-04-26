@@ -4,7 +4,7 @@ Skill MCP is a Spring Boot based MCP server for discovering Skills that are dist
 
 The server is intentionally small for v1:
 
-- Java 21 and Spring Boot, following the baseline style of `ssobue/demo`.
+- Java 25 and Spring Boot, following the baseline style of `ssobue/demo`.
 - Package namespace: `dev.sobue.ai.skill.mcp`.
 - JSON support uses Spring Boot managed Jackson 3.
 - Skill manifest YAML parsing uses SnakeYAML.

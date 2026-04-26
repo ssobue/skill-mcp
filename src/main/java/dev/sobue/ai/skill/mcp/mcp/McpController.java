@@ -5,6 +5,7 @@ import dev.sobue.ai.skill.mcp.catalog.SkillEntry;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,17 +14,13 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 @RestController
+@RequiredArgsConstructor
 public class McpController {
 
   private static final String PROTOCOL_VERSION = "2025-11-25";
 
   private final SkillCatalogService catalogService;
   private final JsonMapper objectMapper;
-
-  public McpController(SkillCatalogService catalogService, JsonMapper objectMapper) {
-    this.catalogService = catalogService;
-    this.objectMapper = objectMapper;
-  }
 
   @PostMapping("/mcp")
   public ResponseEntity<JsonRpcResponse> handle(@RequestBody JsonRpcRequest request) {

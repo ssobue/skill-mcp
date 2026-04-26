@@ -10,25 +10,20 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class SkillCatalogService {
 
   private final SkillMcpProperties properties;
   private final SkillScanner scanner;
   private final GitHubSkillScanner gitHubSkillScanner;
   private final AtomicReference<CatalogSnapshot> snapshot = new AtomicReference<>(CatalogSnapshot.empty());
-
-  public SkillCatalogService(
-      SkillMcpProperties properties, SkillScanner scanner, GitHubSkillScanner gitHubSkillScanner) {
-    this.properties = properties;
-    this.scanner = scanner;
-    this.gitHubSkillScanner = gitHubSkillScanner;
-  }
 
   @EventListener(ApplicationReadyEvent.class)
   public void refreshOnStartup() {
@@ -39,8 +34,8 @@ public class SkillCatalogService {
   public void refresh() {
     CatalogSnapshot next =
         merge(
-            scanner.scan(properties.getScan().getRoots()),
-            gitHubSkillScanner.scan(properties.getGithub()));
+            scanner.scan(properties.scan().roots()),
+            gitHubSkillScanner.scan(properties.github()));
     snapshot.set(next);
   }
 

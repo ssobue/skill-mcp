@@ -39,8 +39,8 @@ public class GitHubAppJwtProvider {
   }
 
   public String createJwt() throws IOException {
-    SkillMcpProperties.GitHub github = properties.getGithub();
-    if (!StringUtils.hasText(github.getAppId())) {
+    SkillMcpProperties.GitHub github = properties.github();
+    if (!StringUtils.hasText(github.appId())) {
       throw new IOException("GitHub App app-id is required");
     }
     try {
@@ -54,7 +54,7 @@ public class GitHubAppJwtProvider {
                   "exp",
                   now.plusSeconds(540).getEpochSecond(),
                   "iss",
-                  github.getAppId()));
+                  github.appId()));
       String signingInput =
           base64Url(header.getBytes(StandardCharsets.UTF_8))
               + "."
@@ -69,13 +69,13 @@ public class GitHubAppJwtProvider {
   }
 
   private String privateKeyPem(SkillMcpProperties.GitHub github) throws IOException {
-    if (StringUtils.hasText(github.getPrivateKey())) {
-      return github.getPrivateKey().replace("\\n", "\n");
+    if (StringUtils.hasText(github.privateKey())) {
+      return github.privateKey().replace("\\n", "\n");
     }
-    if (github.getPrivateKeyPath() == null) {
+    if (github.privateKeyPath() == null) {
       throw new IOException("GitHub App private key or private-key-path is required");
     }
-    return Files.readString(github.getPrivateKeyPath(), StandardCharsets.UTF_8);
+    return Files.readString(github.privateKeyPath(), StandardCharsets.UTF_8);
   }
 
   private PrivateKey parsePrivateKey(String pem) throws GeneralSecurityException {

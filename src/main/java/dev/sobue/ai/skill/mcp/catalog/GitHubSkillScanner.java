@@ -12,10 +12,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
+@RequiredArgsConstructor
 public class GitHubSkillScanner {
 
   private static final Pattern HTTPS_REPOSITORY =
@@ -26,21 +28,16 @@ public class GitHubSkillScanner {
   private final GitHubClient gitHubClient;
   private final SkillScanner skillScanner;
 
-  public GitHubSkillScanner(GitHubClient gitHubClient, SkillScanner skillScanner) {
-    this.gitHubClient = gitHubClient;
-    this.skillScanner = skillScanner;
-  }
-
   public CatalogSnapshot scan(SkillMcpProperties.GitHub config) {
     List<SkillEntry> entries = new ArrayList<>();
     List<String> warnings = new ArrayList<>();
     Set<String> skillIds = new HashSet<>();
 
-    for (SkillMcpProperties.Repository repository : config.getRepositories()) {
+    for (SkillMcpProperties.Repository repository : config.repositories()) {
       parseRepository(repository)
           .ifPresentOrElse(
               ref -> scanRepository(ref, entries, warnings, skillIds),
-              () -> warnings.add("GitHub repository URL is invalid: " + repository.getUrl()));
+              () -> warnings.add("GitHub repository URL is invalid: " + repository.url()));
     }
 
     entries.sort(Comparator.comparing(SkillEntry::skillId));
@@ -127,24 +124,20 @@ public class GitHubSkillScanner {
   }
 
   private Optional<GitHubRepositoryRef> parseRepository(SkillMcpProperties.Repository repository) {
-    if (!StringUtils.hasText(repository.getUrl())) {
+    if (!StringUtils.hasText(repository.url())) {
       return Optional.empty();
     }
-    Matcher https = HTTPS_REPOSITORY.matcher(repository.getUrl());
+    Matcher https = HTTPS_REPOSITORY.matcher(repository.url());
     if (https.matches()) {
       return Optional.of(
-          new GitHubRepositoryRef(https.group(1), https.group(2), repository.getUrl(), ref(repository)));
+          new GitHubRepositoryRef(https.group(1), https.group(2), repository.url(), repository.ref()));
     }
-    Matcher ssh = SSH_REPOSITORY.matcher(repository.getUrl());
+    Matcher ssh = SSH_REPOSITORY.matcher(repository.url());
     if (ssh.matches()) {
       return Optional.of(
-          new GitHubRepositoryRef(ssh.group(1), ssh.group(2), repository.getUrl(), ref(repository)));
+          new GitHubRepositoryRef(ssh.group(1), ssh.group(2), repository.url(), repository.ref()));
     }
     return Optional.empty();
-  }
-
-  private String ref(SkillMcpProperties.Repository repository) {
-    return StringUtils.hasText(repository.getRef()) ? repository.getRef() : "main";
   }
 
   private String normalizePath(String path) {
