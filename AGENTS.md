@@ -13,6 +13,8 @@ This repository contains Skill MCP, a Spring Boot based MCP catalog server for S
 - Use Spring Boot managed Jackson 3 for JSON.
 - Use SnakeYAML for `skill.yaml`; do not add Jackson YAML for manifest parsing.
 - Use Hub4j GitHub API for GitHub repository access.
+- Main source packages are JSpecify `@NullMarked`; keep `package-info.java` present for new packages.
+- `./mvnw verify` runs NullAway for main source null checks. Use `@Nullable` only where `null` is part of the public or external-input contract.
 - Run tests with:
 
 ```bash

@@ -9,6 +9,7 @@ v1では意図的に小さく始めます。
 - JSON処理はSpring Boot管理のJackson 3を使用
 - Skill manifestのYAML読み込みはSnakeYAMLを使用
 - GitHubリポジトリアクセスはGitHub App認証付きのHub4j GitHub APIを使用
+- main sourceのpackageはJSpecify `@NullMarked` にし、Maven compile時にNullAwayで検査
 - 認証・認可なし
 - データベースなし
 - 監査ログなし
@@ -37,6 +38,9 @@ Skill MCPは意図的に範囲を絞っています。内部SkillをGitからカ
 ```bash
 ./mvnw verify
 ```
+
+`verify` ではmain sourceに対してJSpecify対応のNullAwayも実行します。`@Nullable`
+は、外部入力の境界や任意のmanifest/configuration項目など、`null` が契約の一部である箇所に限定して付けます。
 
 GraalVM native executableをビルドします。
 

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -156,7 +157,7 @@ public class GitHubSkillScanner {
     return path.replaceAll("^/+", "").replaceAll("/{2,}", "/");
   }
 
-  private List<String> nullToList(List<String> values) {
+  private List<String> nullToList(@Nullable List<String> values) {
     return values == null ? List.of() : List.copyOf(values);
   }
 }

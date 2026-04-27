@@ -55,6 +55,12 @@ Main components:
 
 JSON serialization uses Spring Boot managed Jackson 3. YAML manifest parsing uses SnakeYAML, matching Spring Boot's YAML stack instead of Jackson YAML.
 
+Main source packages are annotated with JSpecify `@NullMarked` in `package-info.java`.
+The Maven build configures Error Prone and NullAway through the Nullability Maven
+Plugin so nullability regressions fail at compile time. Nullable annotations are used
+only for external input boundaries, optional configuration values, and optional manifest
+metadata.
+
 ## Catalog Refresh
 
 The server scans configured roots on startup and on a fixed delay.

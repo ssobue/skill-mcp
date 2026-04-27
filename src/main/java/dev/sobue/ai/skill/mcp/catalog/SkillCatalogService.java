@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,7 +44,11 @@ public class SkillCatalogService {
     return snapshot.get();
   }
 
-  public List<SkillEntry> search(String query, String tag, String ownerDepartment, String ownerTeam) {
+  public List<SkillEntry> search(
+      @Nullable String query,
+      @Nullable String tag,
+      @Nullable String ownerDepartment,
+      @Nullable String ownerTeam) {
     String normalizedQuery = normalize(query);
     String normalizedTag = normalize(tag);
     String normalizedDepartment = normalize(ownerDepartment);
@@ -70,7 +75,7 @@ public class SkillCatalogService {
         || skill.tags().stream().anyMatch(tag -> normalize(tag).contains(query));
   }
 
-  private String normalize(String value) {
+  private String normalize(@Nullable String value) {
     return value == null ? "" : value.toLowerCase().trim();
   }
 

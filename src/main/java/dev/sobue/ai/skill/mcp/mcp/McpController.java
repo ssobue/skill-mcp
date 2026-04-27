@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -169,6 +170,9 @@ public class McpController {
     }
     if ("get_skill_location".equals(name)) {
       String skillId = stringValue(arguments, KEY_SKILL_ID);
+      if (skillId == null) {
+        return JsonRpcResponse.error(request.id(), -32602, "get_skill_location requires skill_id");
+      }
       return catalogService
           .findById(skillId)
           .map(skill -> JsonRpcResponse.result(request.id(), textToolResult(toJson(locationView(skill)))))
@@ -272,11 +276,13 @@ public class McpController {
     return value instanceof Map<?, ?> map ? (Map<String, Object>) map : Map.of();
   }
 
+  @Nullable
   private String stringParam(JsonRpcRequest request, String key) {
     return stringValue(request.params(), key);
   }
 
-  private String stringValue(Map<String, Object> values, String key) {
+  @Nullable
+  private String stringValue(@Nullable Map<String, Object> values, String key) {
     if (values == null || values.get(key) == null) {
       return null;
     }

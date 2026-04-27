@@ -13,6 +13,7 @@ import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,6 +22,7 @@ public class GitHubApiClient implements GitHubClient {
 
   private final SkillMcpProperties properties;
   private final GitHubAppJwtProvider jwtProvider;
+  @Nullable
   private InstallationGitHubCache installationGitHubCache;
 
   @Override

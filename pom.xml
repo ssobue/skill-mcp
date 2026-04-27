@@ -48,6 +48,9 @@
         <jacoco.version>0.8.14</jacoco.version>
         <mcp.version>0.18.1</mcp.version>
         <github-api.version>1.330</github-api.version>
+        <jspecify.version>1.0.0</jspecify.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <nullability-maven-plugin.version>0.3.0</nullability-maven-plugin.version>
         <surefireArgLine />
         <!-- for SonarCloud -->
         <sonar.projectKey>ssobue_skill-mcp</sonar.projectKey>
@@ -71,6 +74,11 @@
                 <groupId>org.kohsuke</groupId>
                 <artifactId>github-api</artifactId>
                 <version>${github-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>${jspecify.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -99,6 +107,10 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -131,6 +143,19 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>am.ik.maven</groupId>
+                <artifactId>nullability-maven-plugin</artifactId>
+                <version>${nullability-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>configure</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

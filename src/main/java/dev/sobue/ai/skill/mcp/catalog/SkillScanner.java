@@ -14,9 +14,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.yaml.snakeyaml.Yaml;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.yaml.snakeyaml.Yaml;
 
 @Component
 public class SkillScanner {
@@ -134,7 +135,8 @@ public class SkillScanner {
   }
 
   @SuppressWarnings("unchecked")
-  private ExecutableDefinition executable(Object value) {
+  @Nullable
+  private ExecutableDefinition executable(@Nullable Object value) {
     if (!(value instanceof Map<?, ?> map)) {
       return null;
     }
@@ -151,10 +153,10 @@ public class SkillScanner {
 
   private String stringValue(Map<String, Object> values, String key) {
     Object value = values.get(key);
-    return value == null ? null : value.toString();
+    return value == null ? "" : value.toString();
   }
 
-  private List<String> stringList(Object value) {
+  private List<String> stringList(@Nullable Object value) {
     if (value instanceof List<?> list) {
       return list.stream().map(Object::toString).toList();
     }
@@ -165,7 +167,7 @@ public class SkillScanner {
   }
 
   @SuppressWarnings("unchecked")
-  private List<Map<String, Object>> mapList(Object value) {
+  private List<Map<String, Object>> mapList(@Nullable Object value) {
     if (value instanceof List<?> list) {
       return list.stream()
           .filter(Map.class::isInstance)
@@ -176,7 +178,7 @@ public class SkillScanner {
   }
 
   @SuppressWarnings("unchecked")
-  private Map<String, Object> mapValue(Object value) {
+  private Map<String, Object> mapValue(@Nullable Object value) {
     return value instanceof Map<?, ?> map ? (Map<String, Object>) map : Map.of();
   }
 
@@ -249,7 +251,7 @@ public class SkillScanner {
     return Optional.empty();
   }
 
-  private List<String> nullToList(List<String> values) {
+  private List<String> nullToList(@Nullable List<String> values) {
     return values == null ? List.of() : List.copyOf(values);
   }
 }

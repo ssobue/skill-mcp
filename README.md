@@ -9,6 +9,7 @@ The server is intentionally small for v1:
 - JSON support uses Spring Boot managed Jackson 3.
 - Skill manifest YAML parsing uses SnakeYAML.
 - GitHub repository access uses Hub4j GitHub API with GitHub App authentication.
+- Main source packages are JSpecify `@NullMarked`; Maven runs NullAway during compilation.
 - No authentication or authorization.
 - No database.
 - No audit log.
@@ -37,6 +38,10 @@ Build the application:
 ```bash
 ./mvnw verify
 ```
+
+`verify` also runs JSpecify-aware NullAway checks against main sources. Add `@Nullable`
+only at API boundaries or optional manifest/configuration fields where `null` is part of
+the contract.
 
 Build a GraalVM native executable:
 
