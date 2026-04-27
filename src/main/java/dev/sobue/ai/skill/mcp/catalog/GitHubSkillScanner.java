@@ -141,17 +141,15 @@ public class GitHubSkillScanner {
     if (!StringUtils.hasText(repository.url())) {
       return Optional.empty();
     }
-    Matcher https = HTTPS_REPOSITORY.matcher(repository.url());
+    String url = Objects.requireNonNull(repository.url());
+    String ref = Objects.requireNonNull(repository.ref());
+    Matcher https = HTTPS_REPOSITORY.matcher(url);
     if (https.matches()) {
-      return Optional.of(
-          new GitHubRepositoryRef(
-              https.group(1), https.group(2), repository.url(), Objects.requireNonNull(repository.ref())));
+      return Optional.of(new GitHubRepositoryRef(https.group(1), https.group(2), url, ref));
     }
-    Matcher ssh = SSH_REPOSITORY.matcher(repository.url());
+    Matcher ssh = SSH_REPOSITORY.matcher(url);
     if (ssh.matches()) {
-      return Optional.of(
-          new GitHubRepositoryRef(
-              ssh.group(1), ssh.group(2), repository.url(), Objects.requireNonNull(repository.ref())));
+      return Optional.of(new GitHubRepositoryRef(ssh.group(1), ssh.group(2), url, ref));
     }
     return Optional.empty();
   }

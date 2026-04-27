@@ -65,7 +65,7 @@ class GitHubApiClientTests {
     when(blob.read()).thenReturn(new ByteArrayInputStream("skill_id: example".getBytes(StandardCharsets.UTF_8)));
 
     AtomicInteger builderCount = new AtomicInteger();
-    try (MockedConstruction<GitHubBuilder> _ =
+    try (var _ =
         mockConstruction(
             GitHubBuilder.class,
             (builder, _) -> {
