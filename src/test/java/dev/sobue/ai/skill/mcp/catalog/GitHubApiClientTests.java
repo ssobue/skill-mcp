@@ -26,7 +26,6 @@ import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.mockito.MockedConstruction;
 
 class GitHubApiClientTests {
 
