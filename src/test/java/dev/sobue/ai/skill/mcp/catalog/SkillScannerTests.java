@@ -104,6 +104,34 @@ class SkillScannerTests {
   }
 
   @Test
+  void reportsMissingScanRoot() {
+    Path missingRoot = tempDir.resolve("missing");
+
+    CatalogSnapshot snapshot = scanner.scan(List.of(missingRoot));
+
+    assertThat(snapshot.skills()).isEmpty();
+    assertThat(snapshot.warnings()).containsExactly("Scan root does not exist: " + missingRoot.normalize());
+  }
+
+  @Test
+  void skipsInvalidManifest() throws IOException {
+    Path skillDir = tempDir.resolve("skills/invalid-skill");
+    Files.createDirectories(skillDir);
+    Files.writeString(skillDir.resolve("SKILL.md"), "# Invalid Skill\n");
+    Files.writeString(
+        skillDir.resolve("skill.yaml"),
+        """
+        skill_id: invalid-skill
+        name: Invalid Skill
+        """);
+
+    CatalogSnapshot snapshot = scanner.scan(List.of(tempDir));
+
+    assertThat(snapshot.skills()).isEmpty();
+    assertThat(snapshot.warnings()).anyMatch(warning -> warning.contains("is invalid"));
+  }
+
+  @Test
   void skipsDuplicateSkillIds() throws IOException {
     writeSkill("skills/first", "duplicate-skill", "First Skill");
     writeSkill("skills/second", "duplicate-skill", "Second Skill");

@@ -2,6 +2,7 @@ package dev.sobue.ai.skill.mcp.mcp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import dev.sobue.ai.skill.mcp.catalog.CatalogSnapshot;
@@ -18,6 +19,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectWriter;
 import tools.jackson.databind.json.JsonMapper;
 
 class SkillMcpServerTests {
@@ -77,6 +80,15 @@ class SkillMcpServerTests {
   }
 
   @Test
+  void failsWhenSkillResourceIsMissing() {
+    when(catalogService.findById("missing")).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> server.readSkillResource("missing"))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Skill not found: missing");
+  }
+
+  @Test
   void readsCatalogSummaryResource() {
     when(catalogService.snapshot()).thenReturn(new CatalogSnapshot(List.of(skill()), List.of(), Instant.now()));
 
@@ -87,6 +99,21 @@ class SkillMcpServerTests {
     assertThat((TextResourceContents) result.contents().getFirst()).extracting(TextResourceContents::text)
         .asString()
         .contains("example-skill");
+  }
+
+  @Test
+  void failsWhenMcpPayloadCannotBeSerialized() {
+    JsonMapper failingMapper = Mockito.mock(JsonMapper.class);
+    ObjectWriter failingWriter = Mockito.mock(ObjectWriter.class);
+    when(failingMapper.writerWithDefaultPrettyPrinter()).thenReturn(failingWriter);
+    when(failingWriter.writeValueAsString(any())).thenThrow(new TestJacksonException("json failed"));
+    SkillMcpServer failingServer = new SkillMcpServer(catalogService, failingMapper);
+    when(catalogService.snapshot()).thenReturn(new CatalogSnapshot(List.of(skill()), List.of(), Instant.now()));
+
+    assertThatThrownBy(failingServer::readSkillCatalogSummary)
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Failed to serialize MCP payload")
+        .hasCauseInstanceOf(TestJacksonException.class);
   }
 
   @Test
@@ -144,5 +171,12 @@ class SkillMcpServerTests {
         Path.of("skills/example-skill/skill.yaml"),
         Path.of("skills/example-skill"),
         Instant.now());
+  }
+
+  private static final class TestJacksonException extends JacksonException {
+
+    private TestJacksonException(String message) {
+      super(message);
+    }
   }
 }
