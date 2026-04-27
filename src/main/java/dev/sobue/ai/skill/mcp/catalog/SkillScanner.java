@@ -190,7 +190,7 @@ public class SkillScanner {
     require(errors, manifest.ownerDepartment(), "owner_department");
     require(errors, manifest.ownerTeam(), "owner_team");
     require(errors, manifest.skillPath(), "skill_path");
-    if (manifest.tags() == null || manifest.tags().isEmpty()) {
+    if (manifest.tags().isEmpty()) {
       errors.add("tags is required");
     }
     return errors;

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -143,12 +144,14 @@ public class GitHubSkillScanner {
     Matcher https = HTTPS_REPOSITORY.matcher(repository.url());
     if (https.matches()) {
       return Optional.of(
-          new GitHubRepositoryRef(https.group(1), https.group(2), repository.url(), repository.ref()));
+          new GitHubRepositoryRef(
+              https.group(1), https.group(2), repository.url(), Objects.requireNonNull(repository.ref())));
     }
     Matcher ssh = SSH_REPOSITORY.matcher(repository.url());
     if (ssh.matches()) {
       return Optional.of(
-          new GitHubRepositoryRef(ssh.group(1), ssh.group(2), repository.url(), repository.ref()));
+          new GitHubRepositoryRef(
+              ssh.group(1), ssh.group(2), repository.url(), Objects.requireNonNull(repository.ref())));
     }
     return Optional.empty();
   }
