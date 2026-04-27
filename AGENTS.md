@@ -11,6 +11,7 @@ This repository contains Skill MCP, a Spring Boot based MCP catalog server for S
 - The base package is `dev.sobue.ai.skill.mcp`.
 - Use Maven Wrapper for builds.
 - Use Spring Boot managed Jackson 3 for JSON.
+- Use Spring AI MCP server starter and annotations for MCP transport and capabilities.
 - Use SnakeYAML for `skill.yaml`; do not add Jackson YAML for manifest parsing.
 - Use Hub4j GitHub API for GitHub repository access.
 - Main source packages are JSpecify `@NullMarked`; keep `package-info.java` present for new packages.
@@ -50,7 +51,7 @@ export JAVA_HOME="$(/usr/libexec/java_home -v 25)"
 - Do not add audit logging in v1.
 - Do not execute Skill source code on the central server.
 - Treat executable Skill metadata as instructions for user-side agents.
-- Keep MCP response shapes compatible with JSON-RPC MCP clients.
+- Keep MCP capabilities compatible with Spring AI MCP server transport and MCP clients.
 
 ## Skill Manifest Rules
 

@@ -5,6 +5,7 @@ Skill MCP is a Spring Boot based MCP server for discovering Skills that are dist
 The server is intentionally small for v1:
 
 - Java 25 and Spring Boot, following the baseline style of `ssobue/demo`.
+- MCP transport and capability registration use Spring AI 2.0.0-M4.
 - Package namespace: `dev.sobue.ai.skill.mcp`.
 - JSON support uses Spring Boot managed Jackson 3.
 - Skill manifest YAML parsing uses SnakeYAML.
@@ -16,7 +17,7 @@ The server is intentionally small for v1:
 - No central execution of Skill source code.
 - In-memory catalog rebuilt from local Git/worktree scans and configured GitHub repositories.
 
-The server exposes a JSON-RPC MCP endpoint at `/mcp`.
+The server exposes a Spring AI managed MCP endpoint at `/mcp`.
 
 ## Why This Exists
 
@@ -80,21 +81,25 @@ GitHub access is designed for GitHub Apps, not personal access tokens. The app n
 
 ## MCP Interface
 
-Supported methods:
+The MCP protocol endpoint is provided by Spring AI's WebMVC MCP server starter using
+stateless Streamable HTTP. MCP clients still connect to `/mcp`; initialization,
+resource, tool, and prompt protocol handling is managed by Spring AI.
 
-- `initialize`
-- `resources/list`
-- `resources/read`
-- `resources/templates/list`
-- `tools/list`
-- `tools/call`
-- `prompts/list`
-- `prompts/get`
+Skill MCP contributes capabilities through Spring AI MCP annotations:
 
 Available tools:
 
 - `search_skills`: search Skills by keyword, tag, department, or team.
 - `get_skill_location`: return repository URL, ref, and Skill path for a Skill.
+
+Available resources:
+
+- `skill-catalog://summary`: read a summary of all discovered Skills.
+- `skill://{skill_id}`: read metadata and location for a discovered Skill.
+
+Available prompts:
+
+- `find-skill`: help a client find a suitable Skill for a user task.
 
 Example `search_skills` call:
 
@@ -406,8 +411,8 @@ Then provide a short summary of recommended fixes.
 
 When the central MCP server scans this repository, it should expose discovered Skills through:
 
-- `resources/list`: list available Skills.
-- `resources/read`: read metadata for `skill://<skill-id>`.
+- `skill-catalog://summary`: list available Skills.
+- `skill://<skill-id>`: read metadata for a single Skill.
 - `search_skills`: search by keyword, tag, department, or team.
 - `get_skill_location`: return the Git repository URL, ref, and Skill path.
 

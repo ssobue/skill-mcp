@@ -23,7 +23,8 @@ For v1:
 - Do not implement authentication or authorization.
 - Do not implement audit logging.
 - Do not execute Skill source code on the central server.
-- Expose catalog access through MCP-compatible JSON-RPC methods at `/mcp`.
+- Expose catalog access through Spring AI's MCP server starter at `/mcp`.
+- Register Skill catalog capabilities with Spring AI MCP annotations.
 
 ## Consequences
 

@@ -5,6 +5,18 @@ spring:
     banner-mode: off
   profiles:
     active: dev
+  ai:
+    mcp:
+      server:
+        protocol: STATELESS
+        type: SYNC
+        name: skill-mcp
+        version: 0.0.1
+        instructions: "Search and locate organization Skills stored in distributed Git repositories."
+        capabilities:
+          completion: false
+        annotation-scanner:
+          enabled: true
 
 logging:
   level:

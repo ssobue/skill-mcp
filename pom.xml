@@ -46,7 +46,7 @@
     <properties>
         <java.version>25</java.version>
         <jacoco.version>0.8.14</jacoco.version>
-        <mcp.version>0.18.1</mcp.version>
+        <spring-ai.version>2.0.0-M4</spring-ai.version>
         <github-api.version>1.330</github-api.version>
         <jspecify.version>1.0.0</jspecify.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
@@ -64,9 +64,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.modelcontextprotocol.sdk</groupId>
-                <artifactId>mcp-bom</artifactId>
-                <version>${mcp.version}</version>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -85,12 +85,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.modelcontextprotocol.sdk</groupId>
-            <artifactId>mcp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.modelcontextprotocol.sdk</groupId>
-            <artifactId>mcp-spring-webmvc</artifactId>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

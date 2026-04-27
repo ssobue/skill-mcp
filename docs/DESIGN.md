@@ -4,7 +4,7 @@
 
 Skill MCP is a central catalog for Skills stored in multiple Git repositories owned by departments or teams.
 
-The server does not store Skill source code. It scans configured local repository roots and configured GitHub repositories, reads `skill.yaml` manifests, validates each Skill directory, and keeps the resulting catalog in memory.
+The server does not store Skill source code. It scans configured local repository roots and configured GitHub repositories, reads `skill.yaml` manifests, validates each Skill directory, and keeps the resulting catalog in memory. MCP transport and capability registration are provided by Spring AI 2.0 milestone APIs.
 
 ## Background
 
@@ -51,7 +51,9 @@ Main components:
 - `GitHubSkillScanner`: scans configured GitHub repositories through a `GitHubClient` abstraction.
 - `GitHubApiClient`: uses Hub4j GitHub API to authenticate as a GitHub App installation and read repository trees and blobs.
 - `SkillCatalogService`: owns the current in-memory `CatalogSnapshot` and refreshes it on startup and schedule.
-- `McpController`: exposes JSON-RPC MCP methods at `/mcp`.
+- `SkillMcpServer`: exposes Skill tools, resources, and prompts with Spring AI MCP annotations.
+
+Spring AI's WebMVC MCP server starter owns the `/mcp` protocol endpoint. The application configures it as a stateless Streamable HTTP MCP server and contributes capabilities through `@McpTool`, `@McpResource`, and `@McpPrompt`.
 
 JSON serialization uses Spring Boot managed Jackson 3. YAML manifest parsing uses SnakeYAML, matching Spring Boot's YAML stack instead of Jackson YAML.
 
@@ -110,22 +112,15 @@ Optional fields:
 
 ## MCP Methods
 
-The `/mcp` endpoint accepts JSON-RPC requests.
+The `/mcp` endpoint is managed by Spring AI's MCP server transport.
 
-Supported protocol methods:
-
-- `initialize`
-- `resources/list`
-- `resources/read`
-- `resources/templates/list`
-- `tools/list`
-- `tools/call`
-- `prompts/list`
-- `prompts/get`
+Spring AI handles protocol methods such as initialize, resources, tools, and prompts.
+Skill MCP registers the catalog capabilities via annotations.
 
 Resources use the URI form:
 
 ```text
+skill-catalog://summary
 skill://<skill_id>
 ```
 
@@ -145,8 +140,8 @@ Executable Skills are not run by the MCP server.
 The intended flow is:
 
 1. User asks an MCP client or agent to find a Skill.
-2. Agent calls `search_skills` or `resources/list`.
-3. Agent calls `get_skill_location` or `resources/read`.
+2. Agent calls `search_skills` or reads `skill-catalog://summary`.
+3. Agent calls `get_skill_location` or reads `skill://<skill_id>`.
 4. Agent fetches the Skill from Git into the user's workspace.
 5. Agent reads `SKILL.md` and `skill.yaml`.
 6. If execution is needed, the agent asks for approval and runs locally according to the user's environment policy.

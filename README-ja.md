@@ -5,6 +5,7 @@ Skill MCPは、部門やチームが管理する複数のGitリポジトリに�
 v1では意図的に小さく始めます。
 
 - `ssobue/demo` の作法に寄せたJava 25 + Spring Boot構成
+- MCP transportとcapability登録はSpring AI 2.0.0-M4を使用
 - package/namespaceは `dev.sobue.ai.skill.mcp`
 - JSON処理はSpring Boot管理のJackson 3を使用
 - Skill manifestのYAML読み込みはSnakeYAMLを使用
@@ -16,7 +17,7 @@ v1では意図的に小さく始めます。
 - 中央サーバーでSkillのソースコードを実行しない
 - ローカルGit/worktreeスキャンと設定済みGitHubリポジトリからメモリ上にカタログを再構築
 
-MCP endpointは `/mcp` です。
+Spring AIが管理するMCP endpointは `/mcp` です。
 
 ## このソフトウェアを作った背景
 
@@ -79,21 +80,24 @@ GitHubアクセスはpersonal access tokenではなくGitHub App前提です。�
 
 ## MCPインターフェース
 
-対応メソッド:
+MCP protocol endpointはSpring AIのWebMVC MCP server starterが提供します。
+Stateless Streamable HTTPとして `/mcp` に公開し、initialize、resource、tool、promptなどのprotocol処理はSpring AIに委譲します。
 
-- `initialize`
-- `resources/list`
-- `resources/read`
-- `resources/templates/list`
-- `tools/list`
-- `tools/call`
-- `prompts/list`
-- `prompts/get`
+Skill MCPはSpring AI MCP annotationでcapabilityを登録します。
 
 提供ツール:
 
 - `search_skills`: キーワード、tag、部門、チームでSkillを検索する
 - `get_skill_location`: Skillのrepository URL、ref、pathを返す
+
+提供リソース:
+
+- `skill-catalog://summary`: 検出済みSkillのsummaryを読む
+- `skill://{skill_id}`: 検出済みSkillのmetadataとlocationを読む
+
+提供プロンプト:
+
+- `find-skill`: 利用者の作業に合うSkillを探すためのprompt
 
 `search_skills` の例:
 
